@@ -4,8 +4,9 @@ from chrome import Chrome
 import Page
 import Runtime
 
-c = Chrome()
-c.do(Page.navigate("http://adhocteam.us/our-team"))
+async with Chrome() as c:
+    await c.do(Page.enable())
+    await c.do(Page.navigate("http://adhocteam.us/our-team"))
 
 # if we don't wait for the page to load, then we can run the script too
 # early and get an empty array.
