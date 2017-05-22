@@ -41,7 +41,10 @@ class Chrome:
         self.ws = websocket.create_connection(self.tab['webSocketDebuggerUrl'])
 
     def do(self, cmd: ChromeCommand):
-        method = f'{cmd.__module__}.{cmd.__class__.__name__}'
+        # Reverse engineer the command name that was passed in from the object's
+        # meta information. Converts class like `chrome_control.Page.navigate`
+        # to `'Page.navigate'`.
+        method = f'{cmd.__module__.split(".")[-1]}.{cmd.__class__.__name__}'
 
         msg = {
             "id": self.idx,
@@ -50,6 +53,7 @@ class Chrome:
         }
         if self.debug:
             print("sent: ", json.dumps(msg, cls=ObjectEncoder))
+
         self.ws.send(json.dumps(msg, cls=ObjectEncoder))
 
         o = json.loads(self.ws.recv())
